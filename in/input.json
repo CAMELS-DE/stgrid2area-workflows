@@ -1,15 +1,20 @@
 {
-    "foobar": {
+    "eobs": {
         "parameters": {
-            "foo_int": 42,
-            "foo_float": 13.37,
-            "foo_string": "Never eat yellow snow",
-            "foo_enum": "bar",
-            "foo_array": [34, 55, 23, 43, 23]
+            "areas_id_column": "gauge_id"
         },
         "data": {
-            "foo_matrix": "/in/foo_matrix.dat",
-            "foo_csv": "/in/foo_csv.csv"
+            "areas": "/in/catchments/catchments.gpkg",
+            "eobs_stgrid": "/in/eobs/pp_*.nc"
+        }
+    },
+    "hyras": {
+        "parameters": {
+            "areas_id_column": "gauge_id"
+        },
+        "data": {
+            "areas": "/in/catchments/catchments.gpkg",
+            "hyras_stgrid": "/in/hyras/rsds*.nc"
         }
     }
 }
