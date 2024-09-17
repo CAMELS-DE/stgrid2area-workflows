@@ -6,6 +6,15 @@ tools:
     parameters:
       areas_id_column: 
         type: string
+        description: The name of the column in the areas file that contains the unique identifier for each area.
+      dask_scheduler_file:
+        type: string
+        optional: true
+        description: |
+          The path to the Dask scheduler file, which describes the Dask cluster to use for parallel processing.  
+          Necessary in HPC environments, e.g. use the `--scheduler-file` option of when starting a Dask cluster 
+          with `mpirun`.
+          If not provided, the tool will create a local cluster.
     data:
       areas:
         extension: 
