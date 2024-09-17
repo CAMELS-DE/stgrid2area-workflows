@@ -3,10 +3,11 @@ import os
 import geopandas as gpd
 import xarray as xr
 from stgrid2area import DistributedDaskProcessor, geodataframe_to_areas
+from dask.distributed import Client
 
 from util import leave_container
 
-def workflow_eobs(parameters: dict, data: dict) -> None:
+def workflow_eobs(parameters: dict, data: dict, dask_scheduler_file: str) -> None:
     """
     Run the E-OBS workflow. This workflow calculates the mean, min, 10th percentile, 
     median, max, 90th percentile, and standard deviation of the precipitation data 
@@ -39,7 +40,12 @@ def workflow_eobs(parameters: dict, data: dict) -> None:
         skip_exist=True
     )
 
-    processor.run()
+    # Run the processor, if a dask scheduler file is provided, use it
+    if parameters["dask_scheduler_file"]:
+        client = Client(scheduler_file=parameters["dask_scheduler_file"])
+        processor.run(client=client)
+    else:
+        processor.run()
 
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
@@ -80,7 +86,12 @@ def workflow_hyras(parameters: dict, data: dict) -> None:
         skip_exist=True
     )
 
-    processor.run()
+    # Run the processor, if a dask scheduler file is provided, use it
+    if parameters["dask_scheduler_file"]:
+        client = Client(scheduler_file=parameters["dask_scheduler_file"])
+        processor.run(client=client)
+    else:
+        processor.run()
 
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
