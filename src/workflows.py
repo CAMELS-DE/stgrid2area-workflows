@@ -41,8 +41,9 @@ def workflow_eobs(parameters: dict, data: dict, dask_scheduler_file: str) -> Non
     )
 
     # Run the processor, if a dask scheduler file is provided, use it
-    if parameters["dask_scheduler_file"]:
-        client = Client(scheduler_file=parameters["dask_scheduler_file"])
+    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
+    if dask_scheduler_file:
+        client = Client(scheduler_file=dask_scheduler_file)
         processor.run(client=client)
     else:
         processor.run()
@@ -87,8 +88,9 @@ def workflow_hyras(parameters: dict, data: dict) -> None:
     )
 
     # Run the processor, if a dask scheduler file is provided, use it
-    if parameters["dask_scheduler_file"]:
-        client = Client(scheduler_file=parameters["dask_scheduler_file"])
+    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
+    if dask_scheduler_file:
+        client = Client(scheduler_file=dask_scheduler_file)
         processor.run(client=client)
     else:
         processor.run()
