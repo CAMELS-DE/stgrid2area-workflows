@@ -40,14 +40,10 @@ def workflow_eobs(parameters: dict, data: dict, dask_scheduler_file: str) -> Non
         skip_exist=True
     )
 
-    # Run the processor, if a dask scheduler file is provided, use it
-    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
-    if dask_scheduler_file:
-        client = Client(scheduler_file=dask_scheduler_file)
-        processor.run(client=client)
-    else:
-        processor.run()
-
+    # Run the processor, if use_mpi is true, Dask will automatically initialize scheduler and workers using MPI 
+    use_mpi = parameters.get("use_mpi", False)
+    processor.run(use_mpi=use_mpi)
+    
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
 
@@ -87,13 +83,9 @@ def workflow_hyras(parameters: dict, data: dict) -> None:
         skip_exist=True
     )
 
-    # Run the processor, if a dask scheduler file is provided, use it
-    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
-    if dask_scheduler_file:
-        client = Client(scheduler_file=dask_scheduler_file)
-        processor.run(client=client)
-    else:
-        processor.run()
-
+    # Run the processor, if use_mpi is true, Dask will automatically initialize scheduler and workers using MPI 
+    use_mpi = parameters.get("use_mpi", False)
+    processor.run(use_mpi=use_mpi)
+    
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
