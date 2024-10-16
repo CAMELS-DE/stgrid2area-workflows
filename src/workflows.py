@@ -4,7 +4,6 @@ import geopandas as gpd
 import xarray as xr
 from stgrid2area import DistributedDaskProcessor, geodataframe_to_areas
 from dask.distributed import Client
-from dask_mpi import initialize
 
 from util import leave_container
 
@@ -41,12 +40,13 @@ def workflow_eobs(parameters: dict, data: dict, dask_scheduler_file: str) -> Non
         skip_exist=True
     )
 
-    # Dask will automatically initialize scheduler and workers using MPI
-    initialize()
-    client = Client()
-    
-    # Run the processor
-    processor.run(client=client)
+    # Run the processor, if a dask scheduler file is provided, use it
+    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
+    if dask_scheduler_file:
+        client = Client(scheduler_file=dask_scheduler_file)
+        processor.run(client=client)
+    else:
+        processor.run()
     
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
@@ -87,12 +87,13 @@ def workflow_hyras(parameters: dict, data: dict) -> None:
         skip_exist=True
     )
 
-    # Dask will automatically initialize scheduler and workers using MPI
-    initialize()
-    client = Client()
-    
-    # Run the processor
-    processor.run(client=client)
+    # Run the processor, if a dask scheduler file is provided, use it
+    dask_scheduler_file = parameters.get("dask_scheduler_file", None)
+    if dask_scheduler_file:
+        client = Client(scheduler_file=dask_scheduler_file)
+        processor.run(client=client)
+    else:
+        processor.run()
     
     # alter file permissions (from docker) and delete unused tool-runner files
     leave_container()
