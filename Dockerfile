@@ -1,6 +1,17 @@
 # Pull Python base image
 FROM python:3.11
 
+# install openmpi to run mpi4py
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    openmpi-bin \
+    openmpi-common \
+    libopenmpi-dev \
+    libopenmpi3
+
+# install mpi4py 
+RUN pip install mpi4py
+
 # install the toolbox runner tools
 RUN pip install "json2args>=0.6.2"
 
