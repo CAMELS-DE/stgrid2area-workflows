@@ -9,9 +9,6 @@ RUN apt-get update && apt-get install -y \
     libopenmpi-dev \
     libopenmpi3
 
-# install mpi4py 
-RUN pip install mpi4py
-
 # install the toolbox runner tools
 RUN pip install "json2args>=0.6.2"
 
@@ -19,6 +16,9 @@ RUN pip install "json2args>=0.6.2"
 RUN pip install stgrid2area
 # RUN git clone https://github.com/AlexDo1/stgrid2area.git
 # RUN pip install -e stgrid2area
+
+# install mpi4py and dask_mpi 
+RUN pip install mpi4py dask_mpi
 
 # create the tool input structure
 RUN mkdir /in
