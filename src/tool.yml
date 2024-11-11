@@ -7,14 +7,27 @@ tools:
       areas_id_column: 
         type: string
         description: The name of the column in the areas file that contains the unique identifier for each area.
-      dask_scheduler_file:
-        type: string
-        optional: true
+      variables: 
+        type: enum
+        values:
+          - all
+          - precipitation
+          - radiation
+          - humidity
+          - mean_temperature
+          - max_temperature
+          - min_temperature
+          - air_pressure_sea_level
+          - wind_speed
+        default: all
         description: |
-          The path to the Dask scheduler file, which describes the Dask cluster to use for parallel processing.  
-          Necessary in HPC environments, e.g. use the `--scheduler-file` option of when starting a Dask cluster 
-          with `mpirun`.
-          If not provided, the tool will create a local cluster.
+          The variables to download. If 'all' is selected, all variables 
+          will be processed. You can also use wildcards to process multiple files of one variable at once, e.g. `pp*.nc`.
+      skip_exist:
+        type: bool
+        default: replace
+        description: |
+          If true, existing files will be skipped. If false, existing files will be replaced.
     data:
       areas:
         extension: 
@@ -22,8 +35,37 @@ tools:
           - .shp
           - .geojson
         description: A vector file containing the areas to which the data should be clipped and aggregated.
-      eobs_stgrid:
+      eobs_stgrid_precipitation:
         extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_radiation:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_humidity:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_mean_temperature:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_max_temperature:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_min_temperature:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_air_pressure_sea_level:
+        extension: .nc
+        optional: true
+        description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
+      eobs_stgrid_wind_speed:
+        extension: .nc
+        optional: true
         description: The E-OBS data in spatio-temporal grid format (E-OBS is available in netCDF format).
   hyras:
     title: Clip and aggregate HYRAS data
@@ -32,14 +74,25 @@ tools:
     parameters:
       areas_id_column: 
         type: string
-      dask_scheduler_file:
-        type: string
-        optional: true
+        description: The name of the column in the areas file that contains the unique identifier for each area.
+      variables: 
+        type: enum
+        values:
+          - all
+          - precipitation
+          - radiation
+          - humidity
+          - mean_temperature
+          - max_temperature
+          - min_temperature
+        default: all
         description: |
-          The path to the Dask scheduler file, which describes the Dask cluster to use for parallel processing.  
-          Necessary in HPC environments, e.g. use the `--scheduler-file` option of when starting a Dask cluster 
-          with `mpirun`.
-          If not provided, the tool will create a local cluster. 
+          The variables to clip and aggregate. If 'all' is selected, all variables will be processed.
+      skip_exist:
+        type: bool
+        default: replace
+        description: |
+          If true, existing files will be skipped. If false, existing files will be replaced.
     data:
       areas:
         extension: 
@@ -47,6 +100,39 @@ tools:
           - .shp
           - .geojson
         description: A vector file containing the areas to which the data should be clipped and aggregated.
-      hyras_stgrid:
+      hyras_stgrid_precipitation:
         extension: .nc
-        description: The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format).
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `pr_hyras*.nc`.
+      hyras_stgrid_radiation:
+        extension: .nc
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `rsds_hyras*.nc`.
+      hyras_stgrid_humidity:
+        extension: .nc
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `hurs_hyras*.nc`.
+      hyras_stgrid_mean_temperature:
+        extension: .nc
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `tas_hyras*.nc`.
+      hyras_stgrid_max_temperature:
+        extension: .nc
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `tasmax_hyras*.nc`.
+      hyras_stgrid_min_temperature:
+        extension: .nc
+        optional: true
+        description: |
+          The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
+          use wildcards to process multiple files at once, e.g. `tasmin_hyras*.nc`.
