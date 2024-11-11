@@ -1,6 +1,6 @@
 import os
 from datetime import datetime as dt
-from workflows import workflow_eobs, workflow_hyras
+from workflows import hyras, eobs
 from json2args import get_parameter
 from json2args.data import get_data_paths
 
@@ -16,11 +16,11 @@ def main():
     # Switch the tool
     if toolname == "eobs":
         # Run the E-OBS workflow
-        workflow_eobs(kwargs, data)
+        eobs.workflow_eobs(kwargs, data)
 
     elif toolname == "hyras":
         # Run the HYRAS workflow
-        workflow_hyras(kwargs, data)
+        hyras.workflow_hyras(kwargs, data)
 
     else:
         # In any other case, it was not clear which tool to run
