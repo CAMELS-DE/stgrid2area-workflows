@@ -6,8 +6,6 @@ RUN pip install "json2args>=0.6.2"
 
 # install stgrid2area
 RUN pip install stgrid2area
-# RUN git clone https://github.com/AlexDo1/stgrid2area.git
-# RUN pip install -e stgrid2area
 
 # create the tool input structure
 RUN mkdir /in
