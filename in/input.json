@@ -1,11 +1,13 @@
 {
     "eobs": {
         "parameters": {
-            "areas_id_column": "gauge_id"
+            "areas_id_column": "gauge_id",
+            "variables": "air_pressure_sea_level",
+            "skip_exist": false
         },
         "data": {
             "areas": "/in/catchments/catchments.gpkg",
-            "eobs_stgrid": "/in/eobs/pp_*.nc"
+            "eobs_stgrid_air_pressure_sea_level": "/in/eobs/pp_*.nc"
         }
     },
     "hyras": {
