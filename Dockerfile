@@ -14,6 +14,9 @@ RUN mkdir /out
 RUN mkdir /src
 COPY ./src /src
 
+# additional folder where input data (stgrid and areas) is mounted
+RUN mkdir /data
+
 # copy the citation file
 COPY ./CITATION.cf[f] /src/CITATION.cff
 
