@@ -3,7 +3,6 @@ import os
 import geopandas as gpd
 import xarray as xr
 from stgrid2area import LocalDaskProcessor, geodataframe_to_areas
-from dask.distributed import Client
 
 from json2args import logger
 
@@ -47,7 +46,7 @@ def workflow_eobs_variable(parameters: dict, data: dict, variable: str) -> None:
     gdf_areas = gdf_areas.to_crs(eobs.rio.crs)
 
     # Convert the geodataframe to stgrid2area areas
-    areas = geodataframe_to_areas(areas=gdf_areas, id_column=parameters["areas_id_column"], output_dir=f"/out/eobs/{variable}")
+    areas = geodataframe_to_areas(areas=gdf_areas, id_column=parameters["areas_id_column"], output_dir=f"/out/eobs/{variable}", sort_by_proximity=True)
 
     # Initialize the LocalDaskProcessor
     processor = LocalDaskProcessor(
@@ -58,6 +57,7 @@ def workflow_eobs_variable(parameters: dict, data: dict, variable: str) -> None:
         operations=["min", "mean", "max", "stdev", "quantile(q=0.1)", "quantile(q=0.2)", "quantile(q=0.3)", "quantile(q=0.4)", "quantile(q=0.5)", "quantile(q=0.6)", "quantile(q=0.7)", "quantile(q=0.8)", "quantile(q=0.9)"],
         n_workers=None, # will automatically be os.cpu_count()
         skip_exist=parameters["skip_exist"],
+        batch_size=parameters.get("batch_size", None),
         logger=logger
     )
 
