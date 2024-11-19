@@ -24,10 +24,17 @@ tools:
           The variables to download. If 'all' is selected, all variables 
           will be processed. You can also use wildcards to process multiple files of one variable at once, e.g. `pp*.nc`.
       skip_exist:
-        type: bool
+        type: boolean
         default: replace
         description: |
           If true, existing files will be skipped. If false, existing files will be replaced.
+      batch_size:
+        type: integer
+        optional: true
+        description: |
+          The number of areas to process in one batch. This can be used to prevent memory issues when processing large 
+          numbers areas. Try decreasing this number if you encounter memory issues. By default, all areas are processed
+          in one batch.
     data:
       areas:
         extension: 
@@ -89,7 +96,7 @@ tools:
         description: |
           The variables to clip and aggregate. If 'all' is selected, all variables will be processed.
       skip_exist:
-        type: bool
+        type: boolean
         default: replace
         description: |
           If true, existing files will be skipped. If false, existing files will be replaced.
