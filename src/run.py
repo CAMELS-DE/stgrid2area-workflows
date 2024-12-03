@@ -1,6 +1,6 @@
 import os
 from datetime import datetime as dt
-from workflows import hyras, eobs
+from workflows import hyras, eobs, radklim_rw
 from json2args import get_parameter
 from json2args.data import get_data_paths
 
@@ -21,6 +21,9 @@ def main():
     elif toolname == "hyras":
         # Run the HYRAS workflow
         hyras.workflow_hyras(kwargs, data)
+    elif toolname == "radklim_rw":
+        # Run the RADKLIM-RW workflow
+        radklim_rw.workflow_radklim_rw(kwargs, data)
 
     else:
         # In any other case, it was not clear which tool to run
