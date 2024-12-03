@@ -143,3 +143,36 @@ tools:
         description: |
           The HYRAS data in spatio-temporal grid format (HYRAS is available in netCDF format). You can also
           use wildcards to process multiple files at once, e.g. `tasmin_hyras*.nc`.
+  radklim_rw:
+    title: Clip and aggregate RADKLIM-RW data
+    description: Uses the stgrid2area package to clip and aggregate RADKLIM-RW data to (catchment) areas.
+    version: 0.1
+    parameters:
+      areas_id_column: 
+        type: string
+        description: The name of the column in the areas file that contains the unique identifier for each area.
+      skip_exist:
+        type: boolean
+        default: replace
+        description: |
+          If true, existing files will be skipped. If false, existing files will be replaced.
+      batch_size:
+        type: integer
+        optional: true
+        description: |
+          The number of areas to process in one batch. This can be used to prevent memory issues when processing large 
+          numbers areas. Try decreasing this number if you encounter memory issues. By default, all areas are processed
+          in one batch.
+    data:
+      areas:
+        extension: 
+          - .gpkg
+          - .shp
+          - .geojson
+        description: A vector file containing the areas to which the data should be clipped and aggregated.
+      radklim_stgrid_precipitation:
+        extension: .nc
+        optional: true
+        description: |
+          The RADKLIM-RW data in spatio-temporal grid format (RADKLIM-RW is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
