@@ -1,22 +1,24 @@
 {
-    "eobs": {
-        "parameters": {
-            "areas_id_column": "gauge_id",
-            "variables": "air_pressure_sea_level",
-            "skip_exist": false
-        },
-        "data": {
-            "areas": "/in/catchments/catchments.gpkg",
-            "eobs_stgrid_air_pressure_sea_level": "/in/eobs/pp_*.nc"
-        }
+  "eobs": {
+    "parameters": {
+      "areas_id_column": "gauge_id",
+      "variables": "air_pressure_sea_level",
+      "skip_exist": false
     },
-    "hyras": {
-        "parameters": {
-            "areas_id_column": "gauge_id"
-        },
-        "data": {
-            "areas": "/in/catchments/catchments.gpkg",
-            "hyras_stgrid": "/in/hyras/rsds*.nc"
-        }
+    "data": {
+      "areas": "/in/catchments/catchments.gpkg",
+      "eobs_stgrid_air_pressure_sea_level": "/in/eobs/*.nc"
     }
+  },
+  "radklim_rw": {
+    "parameters": {
+      "areas_id_column": "gauge_id",
+      "skip_exist": false,
+      "batch_size": 40
+    },
+    "data": {
+      "areas": "/in/catchments/catchments.gpkg",
+      "radklim_rw_stgrid": "/in/radklim_rw/2004/*.nc"
+    }
+  }
 }
