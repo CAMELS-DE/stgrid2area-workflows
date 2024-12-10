@@ -1,4 +1,5 @@
 import os
+from glob import glob
 
 import geopandas as gpd
 import pandas as pd
@@ -20,18 +21,20 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     Additionally, the clipped netCDF files are saved in the output directory.
 
     """
-    # Read RADKLIM data
-    radklim = xr.open_mfdataset(data[f"radklim_rw_stgrid"], combine="by_coords", chunks="auto").unify_chunks()
-
     # this is the RADOLAN grid wkt
     wkt_radolan = 'PROJCS["Stereographic_North_Pole",GEOGCS["GCS_unnamed ellipse",DATUM["D_unknown",SPHEROID["Unknown",6370040,0]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Stereographic_North_Pole"],PARAMETER["standard_parallel_1",60],PARAMETER["central_meridian",10],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]'
-    radklim.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
 
-    # Remove the grid_mapping key from the variable's attributes (problems with xarray)
-    radklim["RR"].attrs.pop("grid_mapping", None)
+    radklim = []
+    radklim_files = glob(data[f"radklim_rw_stgrid"])
 
-    # Group RADKLIM data by month to avoid memory issues when processing big xaaray datasets
-    radklim = [ds[1] for ds in radklim.groupby("time.month")]
+    for radklim_file in radklim_files:
+        radklim_chunk = xr.open_dataset(radklim_file, chunks="auto").unify_chunks()
+        radklim_chunk.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
+
+        # Remove the grid_mapping key from the variable's attributes (problems with xarray)
+        radklim_chunk["RR"].attrs.pop("grid_mapping", None)
+
+        radklim.append(radklim_chunk)
 
     # Read the areas
     gdf_areas = gpd.read_file(data["areas"])
