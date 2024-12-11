@@ -39,6 +39,9 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     # Read the areas
     gdf_areas = gpd.read_file(data["areas"])
 
+    # only Baden-Württemberg for now (starts with DE1)
+    gdf_areas = gdf_areas[gdf_areas[parameters["areas_id_column"]].str.startswith("DE1")]
+
     # Reproject the areas to the CRS of the E-OBS data
     gdf_areas = gdf_areas.to_crs(wkt_radolan)
 
@@ -69,34 +72,37 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
 
     # Merge the clipped and aggregated files (result of grouping the READKLIM data by month)
     for area in areas:
-        # find the clipped netcdf files
-        clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
+        try:
+            # find the clipped netcdf files
+            clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
 
-        # merge the clipped files
-        clipped_merged = xr.open_mfdataset(clipped_files)
+            # merge the clipped files
+            clipped_merged = xr.open_mfdataset(clipped_files)
 
-        # save the merged file
-        clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
+            # save the merged file
+            clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
 
-        # remove the individual files
-        for f in clipped_files:
-            f.unlink()
+            # remove the individual files
+            for f in clipped_files:
+                f.unlink()
 
-        # find the aggregated csv files
-        agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
+            # find the aggregated csv files
+            agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
 
-        # merge the csv files
-        agg_merged = pd.concat([pd.read_csv(f) for f in agg_files], ignore_index=True)
+            # merge the csv files
+            agg_merged = pd.concat([pd.read_csv(f) for f in agg_files], ignore_index=True)
 
-        # sort the values by time
-        agg_merged = agg_merged.sort_values("time")
+            # sort the values by time
+            agg_merged = agg_merged.sort_values("time")
 
-        # save the merged file
-        agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
+            # save the merged file
+            agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
 
-        # remove the individual files
-        for f in agg_files:
-            f.unlink()
+            # remove the individual files
+            for f in agg_files:
+                f.unlink()
+        except Exception as e:
+            logger.error(f"{area.id} --- Error merging the clipped and aggregated files: {e}")
 
     # Log
     logger.info(f"Finished processing.")
