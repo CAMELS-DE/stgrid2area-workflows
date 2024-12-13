@@ -1,5 +1,7 @@
 import os
 from glob import glob
+import concurrent.futures
+from typing import Tuple
 
 import geopandas as gpd
 import pandas as pd
@@ -70,42 +72,75 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     # Log
     logger.info(f"Merging the clipped and aggregated files for each area.")
 
-    # Merge the clipped and aggregated files (result of grouping the READKLIM data by month)
-    for area in areas:
-        try:
-            # find the clipped netcdf files
-            clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
+    timeout = 3600 # 1 hour timeout per area
 
-            # merge the clipped files
-            clipped_merged = xr.open_mfdataset(clipped_files)
+    # Merge the clipped and aggregated files for each area in parallel    
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        results = []
 
-            # save the merged file
-            clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
+        future_to_area = {executor.submit(merge_output_single_area, area): area for area in areas}
 
-            # remove the individual files
-            for f in clipped_files:
-                f.unlink()
+        for future in concurrent.futures.as_completed(future_to_area, timeout=timeout):
+            try:
+                area_id, success = future.result()
+                results.append((area_id, success))
+            except concurrent.futures.TimeoutError:
+                area = future_to_area[future]
+                logger.error(f"Timeout processing area {area.id} after {timeout} seconds.")
+                results.append((area.id, False))
 
-            # find the aggregated csv files
-            agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
-
-            # merge the csv files
-            agg_merged = pd.concat([pd.read_csv(f) for f in agg_files], ignore_index=True)
-
-            # sort the values by time
-            agg_merged = agg_merged.sort_values("time")
-
-            # save the merged file
-            agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
-
-            # remove the individual files
-            for f in agg_files:
-                f.unlink()
-        except Exception as e:
-            logger.error(f"{area.id} --- Error merging the clipped and aggregated files: {e}")
+    # Log summary
+    success_count = sum(1 for _, success in results if success)
+    logger.info(f"Successfully merged {success_count}/{len(areas)} areas.")
 
     # Log
     logger.info(f"Finished processing.")
 
     # alter file permissions (from docker)
     os.system("chmod -R 777 /out/radklim/precipitation")
+
+    return None
+
+def merge_output_single_area(area) -> Tuple[str, bool]:
+    """
+    Merge clipped and aggregated files for a single area.
+    
+    """
+    try:
+        # Process NetCDF files
+        clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
+        if clipped_files:
+            with xr.open_mfdataset(clipped_files) as clipped_merged:
+                clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
+            # Only remove after successful save
+            for f in clipped_files:
+                f.unlink()
+        else:
+            logger.warning(f"{area.id} --- No clipped files found.")
+                
+        # Process CSV files
+        agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
+        if agg_files:
+            chunks = []
+            for f in agg_files:
+                chunks.append(pd.read_csv(f))
+            agg_merged = pd.concat(chunks, ignore_index=True)
+            agg_merged = agg_merged.sort_values("time")
+            agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
+            # Only remove after successful save
+            for f in agg_files:
+                f.unlink()
+        else:
+            logger.warning(f"{area.id} --- No aggregated files found.")
+
+        return area.id, True
+    except Exception as e:
+        logger.error(f"{area.id} --- Error merging files: {e}")
+        return area.id, False
+    finally:
+        # Ensure memory cleanup
+        if 'clipped_merged' in locals():
+            del clipped_merged
+        if 'agg_merged' in locals():
+            del agg_merged
+    
