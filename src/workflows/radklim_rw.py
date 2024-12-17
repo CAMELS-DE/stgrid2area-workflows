@@ -41,9 +41,6 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     # Read the areas
     gdf_areas = gpd.read_file(data["areas"])
 
-    # only Baden-Württemberg for now (starts with DE1)
-    gdf_areas = gdf_areas[gdf_areas[parameters["areas_id_column"]].str.startswith("DE1")]
-
     # Reproject the areas to the CRS of the E-OBS data
     gdf_areas = gdf_areas.to_crs(wkt_radolan)
 
