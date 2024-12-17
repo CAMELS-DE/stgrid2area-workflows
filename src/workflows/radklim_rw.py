@@ -78,7 +78,7 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = []
 
-        future_to_area = {executor.submit(merge_output_single_area, area): area for area in areas}
+        future_to_area = {executor.submit(merge_output_single_area, area, len(radklim_files)): area for area in areas}
 
         for future in concurrent.futures.as_completed(future_to_area, timeout=timeout):
             try:
@@ -101,26 +101,28 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
 
     return None
 
-def merge_output_single_area(area) -> Tuple[str, bool]:
+def merge_output_single_area(area, n_files_expected: int) -> Tuple[str, bool]:
     """
-    Merge clipped and aggregated files for a single area.
+    Merge clipped and aggregated files for a single area.  
+    The parameter n_files_expected is the number of files that are expected to be merged. If 
+    there are less files, an error is logged.
     
     """
     try:
         # Process NetCDF files
         clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
-        if clipped_files:
+        if len(clipped_files) == n_files_expected:
             with xr.open_mfdataset(clipped_files) as clipped_merged:
                 clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
             # Only remove after successful save
             for f in clipped_files:
                 f.unlink()
         else:
-            logger.warning(f"{area.id} --- No clipped files found.")
+            logger.error(f"{area.id} --- Expected {n_files_expected} clipped files, but found {len(clipped_files)}.")
                 
         # Process CSV files
         agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
-        if agg_files:
+        if len(agg_files) == n_files_expected:
             chunks = []
             for f in agg_files:
                 chunks.append(pd.read_csv(f))
@@ -131,7 +133,8 @@ def merge_output_single_area(area) -> Tuple[str, bool]:
             for f in agg_files:
                 f.unlink()
         else:
-            logger.warning(f"{area.id} --- No aggregated files found.")
+            logger.error(f"{area.id} --- Expected {n_files_expected} aggregated files, but found {len(agg_files)}.")
+            
 
         return area.id, True
     except Exception as e:
