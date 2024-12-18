@@ -26,17 +26,22 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     # this is the RADOLAN grid wkt
     wkt_radolan = 'PROJCS["Stereographic_North_Pole",GEOGCS["GCS_unnamed ellipse",DATUM["D_unknown",SPHEROID["Unknown",6370040,0]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Stereographic_North_Pole"],PARAMETER["standard_parallel_1",60],PARAMETER["central_meridian",10],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]'
 
-    radklim = []
-    radklim_files = glob(data[f"radklim_rw_stgrid"])
+    # radklim = []
+    # radklim_files = glob(data[f"radklim_rw_stgrid"])
 
-    for radklim_file in radklim_files:
-        radklim_chunk = xr.open_dataset(radklim_file, chunks="auto").unify_chunks()
-        radklim_chunk.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
+    # for radklim_file in radklim_files:
+    #     radklim_chunk = xr.open_dataset(radklim_file, chunks="auto").unify_chunks()
+    #     radklim_chunk.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
 
-        # Remove the grid_mapping key from the variable's attributes (problems with xarray)
-        radklim_chunk["RR"].attrs.pop("grid_mapping", None)
+    #     # Remove the grid_mapping key from the variable's attributes (problems with xarray)
+    #     radklim_chunk["RR"].attrs.pop("grid_mapping", None)
 
-        radklim.append(radklim_chunk)
+    #     radklim.append(radklim_chunk)
+
+    radklim = xr.open_mfdataset(data[f"radklim_rw_stgrid"], chunks="auto", combine="by_coords").unify_chunks()
+    radklim.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
+    # Remove the grid_mapping key from the variable's attributes (problems with xarray)
+    radklim["RR"].attrs.pop("grid_mapping", None)
 
     # Read the areas
     gdf_areas = gpd.read_file(data["areas"])
