@@ -98,4 +98,4 @@ def workflow_hyras(parameters: dict, data: dict) -> None:
 
     # Run the workflow for each variable
     for variable in variables:
-        workflow_hyras_variable(parameters, data, variables)
+        workflow_hyras_variable(parameters, data, variable)
