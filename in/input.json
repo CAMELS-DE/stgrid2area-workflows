@@ -20,5 +20,19 @@
       "areas": "/in/catchments/catchments.gpkg",
       "radklim_rw_stgrid": "/in/radklim_rw/2004/*.nc"
     }
+  },
+  "hostrada": {
+    "parameters": {
+      "areas_id_column": "gauge_id",
+      "variables": "cloud_cover",
+      "save_nc": false,
+      "save_csv": true,
+      "skip_exist": false,
+      "batch_size": 40
+    },
+    "data": {
+      "areas": "/in/catchments/catchments.gpkg",
+      "hostrada_stgrid_cloud_cover": "/in/hostrada/cloud_cover/1999/*.nc"
+    }
   }
 }
