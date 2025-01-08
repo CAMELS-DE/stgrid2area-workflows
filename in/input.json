@@ -14,6 +14,8 @@
     "parameters": {
       "areas_id_column": "gauge_id",
       "skip_exist": false,
+      "save_nc": false,
+      "save_csv": true,
       "batch_size": 40
     },
     "data": {
@@ -32,7 +34,17 @@
     },
     "data": {
       "areas": "/in/catchments/catchments.gpkg",
-      "hostrada_stgrid_cloud_cover": "/in/hostrada/cloud_cover/1999/*.nc"
+      "hostrada_stgrid_cloud_cover": "/in/hostrada/cloud_cover/*/*.nc",
+      "hostrada_stgrid_wind_speed": "/in/hostrada/wind_speed/*/*.nc",
+      "hostrada_stgrid_wind_direction": "/in/hostrada/wind_direction/*/*.nc",
+      "hostrada_stgrid_air_temperature_mean": "/in/hostrada/air_temperature_mean/*/*.nc",
+      "hostrada_stgrid_dew_point_temperature": "/in/hostrada/dew_point_temperature/*/*.nc",
+      "hostrada_stgrid_relative_humidity": "/in/hostrada/relative_humidity/*/*.nc",
+      "hostrada_stgrid_water_vapor_mixing_ratio": "/in/hostrada/water_vapor_mixing_ratio/*/*.nc",
+      "hostrada_stgrid_air_pressure_sea_level": "/in/hostrada/air_pressure_sea_level/*/*.nc",
+      "hostrada_stgrid_air_pressure_surface": "/in/hostrada/air_pressure_surface/*/*.nc",
+      "hostrada_stgrid_global_shortwave_radiation": "/in/hostrada/global_shortwave_radiation/*/*.nc",
+      "hostrada_stgrid_urban_heat_island_intensity": "/in/hostrada/urban_heat_island_intensity/*/*.nc"
     }
   }
 }

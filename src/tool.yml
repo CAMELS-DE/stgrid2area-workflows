@@ -156,6 +156,17 @@ tools:
         default: replace
         description: |
           If true, existing files will be skipped. If false, existing files will be replaced.
+      save_nc:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the clipped data in netCDF format. Consider setting this to true increases the processing 
+          time and disk space required a lot.
+      save_csv:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the aggregated data in CSV format.
       batch_size:
         type: integer
         optional: true

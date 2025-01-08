@@ -57,6 +57,8 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
         n_workers=None, # will automatically be os.cpu_count()
         skip_exist=parameters["skip_exist"],
         batch_size=parameters.get("batch_size", None),
+        save_nc=parameters["save_nc"],
+        save_csv=parameters["save_csv"],
         logger=logger
     )
 
@@ -75,7 +77,7 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = []
 
-        future_to_area = {executor.submit(merge_output_single_area, area, len(radklim_files)): area for area in areas}
+        future_to_area = {executor.submit(merge_output_single_area, area, parameters["save_nc"], parameters["save_csv"], len(radklim_files)): area for area in areas}
 
         for future in concurrent.futures.as_completed(future_to_area, timeout=timeout):
             try:
@@ -98,40 +100,43 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
 
     return None
 
-def merge_output_single_area(area, n_files_expected: int) -> Tuple[str, bool]:
+def merge_output_single_area(area, merge_nc: bool, merge_csv: bool, n_files_expected: int) -> Tuple[str, bool]:
     """
     Merge clipped and aggregated files for a single area.  
+    With merge_nc=True, the clipped files are merged into a single NetCDF file.  
+    With merge_csv=True, the aggregated files are merged into a single CSV file.  
     The parameter n_files_expected is the number of files that are expected to be merged. If 
     there are less files, an error is logged.
     
     """
     try:
-        # Process NetCDF files
-        clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
-        if len(clipped_files) == n_files_expected:
-            with xr.open_mfdataset(clipped_files) as clipped_merged:
-                clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
-            # Only remove after successful save
-            for f in clipped_files:
-                f.unlink()
-        else:
-            logger.error(f"{area.id} --- Expected {n_files_expected} clipped files, but found {len(clipped_files)}.")
-                
-        # Process CSV files
-        agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
-        if len(agg_files) == n_files_expected:
-            chunks = []
-            for f in agg_files:
-                chunks.append(pd.read_csv(f))
-            agg_merged = pd.concat(chunks, ignore_index=True)
-            agg_merged = agg_merged.sort_values("time")
-            agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
-            # Only remove after successful save
-            for f in agg_files:
-                f.unlink()
-        else:
-            logger.error(f"{area.id} --- Expected {n_files_expected} aggregated files, but found {len(agg_files)}.")
+        if merge_nc:
+            # Process NetCDF files
+            clipped_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.nc")])
+            if len(clipped_files) == n_files_expected:
+                with xr.open_mfdataset(clipped_files) as clipped_merged:
+                    clipped_merged.to_netcdf(area.output_path / f"{area.id}_clipped.nc")
+                # Only remove after successful save
+                for f in clipped_files:
+                    f.unlink()
+            else:
+                logger.error(f"{area.id} --- Expected {n_files_expected} clipped files, but found {len(clipped_files)}.")
             
+        if merge_csv:
+            # Process CSV files
+            agg_files = sorted([f for f in area.output_path.glob(f"{area.id}_*.csv")])
+            if len(agg_files) == n_files_expected:
+                chunks = []
+                for f in agg_files:
+                    chunks.append(pd.read_csv(f))
+                agg_merged = pd.concat(chunks, ignore_index=True)
+                agg_merged = agg_merged.sort_values("time")
+                agg_merged.to_csv(area.output_path / f"{area.id}_aggregated.csv", index=False)
+                # Only remove after successful save
+                for f in agg_files:
+                    f.unlink()
+            else:
+                logger.error(f"{area.id} --- Expected {n_files_expected} aggregated files, but found {len(agg_files)}.")
 
         return area.id, True
     except Exception as e:
