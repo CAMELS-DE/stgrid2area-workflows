@@ -41,7 +41,7 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     # Read the areas
     gdf_areas = gpd.read_file(data["areas"])
 
-    # Reproject the areas to the CRS of the E-OBS data
+    # Reproject the areas to the CRS of the Radklim data
     gdf_areas = gdf_areas.to_crs(wkt_radolan)
 
     # Convert the geodataframe to stgrid2area areas
