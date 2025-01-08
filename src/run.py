@@ -1,6 +1,6 @@
 import os
 from datetime import datetime as dt
-from workflows import hyras, eobs, radklim_rw
+from workflows import hyras, eobs, radklim_rw, hostrada
 from json2args import get_parameter
 from json2args.data import get_data_paths
 
@@ -24,7 +24,9 @@ def main():
     elif toolname == "radklim_rw":
         # Run the RADKLIM-RW workflow
         radklim_rw.workflow_radklim_rw(kwargs, data)
-
+    elif toolname == "hostrada":
+        # Run the Hostrada workflow
+        hostrada.workflow_hostrada(kwargs, data)
     else:
         # In any other case, it was not clear which tool to run
         raise AttributeError(
