@@ -43,6 +43,9 @@ def workflow_hostrada_variable(parameters: dict, data: dict, variable: str) -> N
     hostrada = []
     hostrada_files = glob(data[f"hostrada_stgrid_{variable}"])
 
+    if len(hostrada_files) == 0:
+        raise ValueError (f"No Hostrada data found at {data[f'hostrada_stgrid_{variable}']}.")
+
     # Read the Hostrada data in chunks (same chunks as the original data from DWD)
     for hostrada_file in hostrada_files:
         hostrada_chunk = xr.open_dataset(hostrada_file, chunks="auto").unify_chunks()

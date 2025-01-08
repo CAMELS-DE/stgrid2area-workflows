@@ -29,6 +29,9 @@ def workflow_radklim_rw(parameters: dict, data: dict) -> None:
     radklim = []
     radklim_files = glob(data[f"radklim_rw_stgrid"])
 
+    if len(radklim_files) == 0:
+        raise ValueError (f"No RADKLIM-RW data found at {data['radklim_rw_stgrid']}.")
+
     for radklim_file in radklim_files:
         radklim_chunk = xr.open_dataset(radklim_file, chunks="auto").unify_chunks()
         radklim_chunk.rio.write_crs(CRS.from_wkt(wkt_radolan), inplace=True)
