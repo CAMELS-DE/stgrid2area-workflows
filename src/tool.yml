@@ -176,3 +176,136 @@ tools:
         description: |
           The RADKLIM-RW data in spatio-temporal grid format (RADKLIM-RW is available in netCDF format). 
           You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+  hostrada:
+    title: Clip and aggregate Hostrada data
+    description: Uses the stgrid2area package to clip and aggregate Hostrada data to (catchment) areas.
+    version: 0.1
+    parameters:
+      areas_id_column: 
+        type: string
+        description: The name of the column in the areas file that contains the unique identifier for each area.
+      variables: 
+        type: enum
+        values:
+          - all
+          - cloud_cover
+          - wind_speed
+          - wind_direction
+          - air_temperature_mean
+          - dew_point_temperature
+          - relative_humidity
+          - water_vapor_mixing_ratio
+          - air_pressure_sea_level
+          - air_pressure_surface
+          - global_shortwave_radiation
+          - urban_heat_island_intensity
+        default: all
+        description: |
+          The variables to clip and aggregate. If 'all' is selected, all variables will be processed.
+      save_nc:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the clipped data in netCDF format. Consider setting this to true increases the processing 
+          time and disk space required a lot.
+      save_csv:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the aggregated data in CSV format.
+      skip_exist:
+        type: boolean
+        default: replace
+        description: |
+          If true, existing files will be skipped. If false, existing files will be replaced.
+      batch_size:
+        type: integer
+        optional: true
+        description: |
+          The number of areas to process in one batch. This can be used to prevent memory issues when processing large 
+          numbers areas. Try decreasing this number if you encounter memory issues. By default, all areas are processed
+          in one batch.
+      save_nc:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the clipped data in netCDF format. Consider setting this to true increases the processing 
+          time and disk space required a lot.
+      save_csv:
+        type: boolean
+        default: true
+        description: |
+          Whether to save the aggregated data in CSV format.
+    data:
+      areas:
+        extension: 
+          - .gpkg
+          - .shp
+          - .geojson
+        description: A vector file containing the areas to which the data should be clipped and aggregated.
+      hostrada_stgrid_cloud_cover:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_wind_speed:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_wind_direction:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_air_temperature_mean:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_dew_point_temperature:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_relative_humidity:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_water_vapor_mixing_ratio:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_air_pressure_sea_level:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_air_pressure_surface:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_global_shortwave_radiation:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
+      hostrada_stgrid_urban_heat_island_intensity:
+        extension: .nc
+        optional: true
+        description: |
+          The Hostrada data in spatio-temporal grid format (Hostrada is available in netCDF format). 
+          You can also use wildcards to process multiple files at once, e.g. `*/*.nc`.
