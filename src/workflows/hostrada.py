@@ -49,6 +49,10 @@ def workflow_hostrada_variable(parameters: dict, data: dict, variable: str) -> N
     # Read the Hostrada data in chunks (same chunks as the original data from DWD)
     for hostrada_file in hostrada_files:
         hostrada_chunk = xr.open_dataset(hostrada_file, chunks="auto").unify_chunks()
+
+        # Remove the time_bnds variable which exists in the global_radiation data
+        if variable == "global_shortwave_radiation":
+            hostrada_chunk = hostrada_chunk.drop_vars("time_bnds")
         
         # Hostrada data is in EPSG:3034
         hostrada_chunk.rio.write_crs("EPSG:3034", inplace=True)
