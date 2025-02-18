@@ -58,6 +58,8 @@ def workflow_eobs_variable(parameters: dict, data: dict, variable: str) -> None:
         n_workers=None, # will automatically be os.cpu_count()
         skip_exist=parameters["skip_exist"],
         batch_size=parameters.get("batch_size", None),
+        save_nc=parameters["save_nc"],
+        save_csv=parameters["save_csv"],
         logger=logger
     )
 
