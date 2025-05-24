@@ -57,7 +57,7 @@ def workflow_hyras_variable(parameters: dict, data: dict, variable: str) -> None
     processor = LocalDaskProcessor(
         areas=areas,
         stgrid=hyras,
-        variable=var_abbr,
+        variables=var_abbr,
         method="fallback_xarray",
         operations=["min", "mean", "max", "stdev", "quantile(q=0.1)", "quantile(q=0.2)", "quantile(q=0.3)", "quantile(q=0.4)", "quantile(q=0.5)", "quantile(q=0.6)", "quantile(q=0.7)", "quantile(q=0.8)", "quantile(q=0.9)"],
         n_workers=None, # will automatically be os.cpu_count()

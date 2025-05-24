@@ -23,7 +23,6 @@ def workflow_hostrada_variable(parameters: dict, data: dict, variable: str) -> N
     Additionally, the clipped netCDF files can be saved in the output directory.
 
     """
-    # Variable name mapping (air_temperature_max  air_temperature_mean  air_temperature_min  global_radiation  humidity  precipitation)
     variable_mapping = {
         "cloud_cover": "clt",
         "wind_speed": "sfcWind",
@@ -72,7 +71,7 @@ def workflow_hostrada_variable(parameters: dict, data: dict, variable: str) -> N
     processor = LocalDaskProcessor(
         areas=areas,
         stgrid=hostrada,
-        variable=var_abbr,
+        variables=var_abbr,
         method="fallback_xarray",
         operations=["min", "mean", "max", "stdev", "quantile(q=0.1)", "quantile(q=0.2)", "quantile(q=0.3)", "quantile(q=0.4)", "quantile(q=0.5)", "quantile(q=0.6)", "quantile(q=0.7)", "quantile(q=0.8)", "quantile(q=0.9)"],
         n_workers=None, # will automatically be os.cpu_count()
